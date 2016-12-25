@@ -2,7 +2,7 @@
 
 using number = std::complex<double>;
 
-uint32_t reverse_bits(uint32_t n, int bits)
+inline uint32_t reverse_bits(uint32_t n, int bits)
 {
 	uint32_t rn = 0;
 	for(int i = 0; i < bits; ++i)
@@ -11,10 +11,9 @@ uint32_t reverse_bits(uint32_t n, int bits)
 	return rn;
 }
 
-void swap_reverse(std::vector<number>& data)
+inline void swap_reverse(std::vector<number>& data, int bits)
 {
-	int bits = __builtin_ctz(data.size());
-	for(unsigned i = 0; i < data.size(); ++i)
+	for(uint32_t i = 0; i < data.size(); ++i)
 	{
 		auto j = reverse_bits(i, bits);
 		if(i < j) std::swap(data[i], data[j]);
@@ -23,8 +22,8 @@ void swap_reverse(std::vector<number>& data)
 
 void fft(std::vector<number>& data)
 {
-	swap_reverse(data);
 	int bits = __builtin_ctz(data.size());
+	swap_reverse(data, bits);
 
 	for(int k = 0; k < bits; ++k)
 	{
