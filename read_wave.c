@@ -13,8 +13,6 @@ int main() {
 	ss.channels = 1;
 	ss.rate = SAMPLE_RATE;
 
-	int error;
-
 	s = pa_simple_new(NULL,
 			"Test",
 			PA_STREAM_RECORD,
@@ -23,7 +21,7 @@ int main() {
 			&ss,
 			NULL,
 			NULL,
-			&error
+			NULL
 			);
 
 	if(!s) {
@@ -32,7 +30,7 @@ int main() {
 	}
 
 	for(;;) {
-		if(pa_simple_read(s, buffer, sizeof(buffer), &error) < 0) {
+		if(pa_simple_read(s, buffer, sizeof(buffer), NULL) < 0) {
 			printf("Error\n");
 			break;
 		}
