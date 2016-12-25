@@ -3,7 +3,7 @@ CXX=g++
 
 CFLAGS=-c -O2 -MMD -MP -Wstrict-prototypes
 CXXFLAGS=-c -O2 -MMD -MP
-LDFLAGS=-lpulse-simple -lm
+LDFLAGS=-lpulse-simple
 
 BUILD_DIR=build
 BINARY=${BUILD_DIR}/main
@@ -15,7 +15,7 @@ DEP_FILES=${OBJ_FILES:.o=.d}
 all: ${BINARY}
 
 ${BINARY}: ${OBJ_FILES}
-	${CC} ${LDFLAGS} $^ -o $@
+	${CXX} ${LDFLAGS} $^ -o $@
 
 ${BUILD_DIR}/%.c.o: %.c
 	mkdir -p ${BUILD_DIR}
