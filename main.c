@@ -4,7 +4,7 @@
 
 short buffer[256];
 
-int main() {
+int main(void) {
 	open_stream();
 	read_stream(buffer, sizeof(buffer));
 	free_stream();
