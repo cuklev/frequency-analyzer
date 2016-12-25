@@ -6,7 +6,7 @@ CXXFLAGS=-c -O2 -MMD -MP
 LDFLAGS=-lpulse-simple -lncurses
 
 BUILD_DIR=build
-BINARY=${BUILD_DIR}/main
+BINARY=${BUILD_DIR}/analyzer
 
 SRC_FILES=$(shell find . -name \*.c -or -name \*.cpp)
 OBJ_FILES=$(SRC_FILES:%=${BUILD_DIR}/%.o)
