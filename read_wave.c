@@ -10,7 +10,7 @@ int main() {
 	pa_sample_spec ss;
 
 	ss.format = PA_SAMPLE_S16NE;
-	ss.channels = 2;
+	ss.channels = 1;
 	ss.rate = SAMPLE_RATE;
 
 	int error;
