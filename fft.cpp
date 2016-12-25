@@ -24,8 +24,9 @@ void swap_reverse(std::vector<number>& data)
 void fft(std::vector<number>& data)
 {
 	swap_reverse(data);
+	int bits = __builtin_ctz(data.size());
 
-	for(unsigned k = 0; (2u << k) <= data.size(); ++k)
+	for(int k = 0; k < bits; ++k)
 	{
 		double angle = M_PI / (1 << k);
 		number primitive_root = {cos(angle), sin(angle)};
@@ -33,12 +34,12 @@ void fft(std::vector<number>& data)
 		for(unsigned i = 0; i < data.size(); i += (2u << k))
 		{
 			number w = {1, 0};
-			for(unsigned j = 0; j < (1u << k); ++j)
+			for(unsigned j = i; j < i + (1u << k); ++j)
 			{
-				data[i + (1u << k) + j] *= w;
-				auto diff = data[i + j] - data[i + (1u << k) + j];
-				data[i + j] += data[i + (1u << k) + j];
-				data[i + (1u << k) + j] = diff;
+				data[j + (1u << k)] *= w;
+				auto diff = data[j] - data[j + (1u << k)];
+				data[j] += data[j + (1u << k)];
+				data[j + (1u << k)] = diff;
 
 				w *= primitive_root;
 			}
