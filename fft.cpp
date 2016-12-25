@@ -2,13 +2,21 @@
 
 using ComplexNumber = std::complex<double>;
 
+#define MASK0 0x55555555
+#define MASK1 0x33333333
+#define MASK2 0x0F0F0F0F
+#define MASK3 0x00FF00FF
+#define MASK4 0x0000FFFF
+#define SWAP_MASK(mask, bits) n = ((n & MASK##mask) << bits) | ((n >> bits) & MASK##mask)
+
 inline uint32_t reverse_bits(uint32_t n, int bits)
 {
-	uint32_t rn = 0;
-	for(int i = 0; i < bits; ++i)
-		if((n >> i) & 1)
-			rn |= 1 << (bits - 1 - i);
-	return rn;
+	SWAP_MASK(0, 1);
+	SWAP_MASK(1, 2);
+	SWAP_MASK(2, 4);
+	SWAP_MASK(3, 8);
+	SWAP_MASK(4, 16);
+	return n >> (32 - bits);
 }
 
 inline void swap_reverse(std::vector<ComplexNumber>& data, int bits)
