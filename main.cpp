@@ -59,7 +59,7 @@ int main() {
 				refresh();
 
 				open_stream();
-				read_stream(buffer, sizeof(buffer));
+				read_stream(buffer, sizeof(short) * sample_count);
 				free_stream();
 
 				for(int i = 0; i < sample_count; ++i)
