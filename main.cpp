@@ -20,25 +20,35 @@ int main() {
 	initscr();
 	raw();
 	noecho();
+	timeout(100);
 
 	int min_frequency = 0;
 	int max_frequency = 20000;
 	int threshold = 1000;
-	int sample_count = MIN_SAMPLE_COUNT;
+	int sample_count = 1 << 15;
 
 	std::vector<std::complex<double>> data(sample_count);
 
 	bool running = true;
+	bool auto_sample = false;
 	while(running) {
+		if(auto_sample) {
+			data.resize(sample_count);
+			read_stream(buffer, sizeof(short) * sample_count);
+
+			for(int i = 0; i < sample_count; ++i)
+				data[i] = (double) buffer[i];
+			fft(data);
+		}
+
 		clear();
 		printw("Threshold: %d\n", threshold);
 		printw("Frequency: %d - %d Hz\n", min_frequency, max_frequency);
 		printw("Sample count: %d\n", sample_count);
 		printw("====================\n");
-		refresh();
 
-		for(int i = 0; i < sample_count / 2; ++i) {
-			double freq = (double) SAMPLE_RATE / sample_count * i;
+		for(int i = 0; i < (int) data.size() / 2; ++i) {
+			double freq = (double) SAMPLE_RATE / data.size() * i;
 			if(freq < min_frequency || freq > max_frequency)
 				continue;
 			double amp = abs(data[i]) * 2 / sample_count;
@@ -47,12 +57,22 @@ int main() {
 			printw("%lfHz\n", freq);
 		}
 
+		if(auto_sample) {
+			attron(A_BOLD);
+			mvprintw(3, 3, " Sampling ... ");
+			attroff(A_BOLD);
+		}
+
+		refresh();
+
 		switch(getch()) {
 			case 'q': // quit
 				running = false;
 				break;
 
 			case 's': // make a sample
+				if(auto_sample) break;
+
 				attron(A_BOLD);
 				mvprintw(3, 3, " Sampling ... ");
 				attroff(A_BOLD);
@@ -62,10 +82,21 @@ int main() {
 				read_stream(buffer, sizeof(short) * sample_count);
 				free_stream();
 
+				data.resize(sample_count);
 				for(int i = 0; i < sample_count; ++i)
 					data[i] = (double) buffer[i];
 				fft(data);
 
+				break;
+			case 'S':
+				if(auto_sample) {
+					auto_sample = false;
+					free_stream();
+				} else {
+					auto_sample = true;
+					open_stream();
+					data.resize(sample_count);
+				}
 				break;
 
 			case 'z':
@@ -94,20 +125,15 @@ int main() {
 				break;
 
 			case 'w':
-				if(sample_count > MIN_SAMPLE_COUNT) {
+				if(sample_count > MIN_SAMPLE_COUNT)
 					sample_count >>= 1;
-					data.resize(sample_count);
-				}
 				break;
 			case 'e':
-				if(sample_count < MAX_SAMPLE_COUNT) {
+				if(sample_count < MAX_SAMPLE_COUNT)
 					sample_count <<= 1;
-					data.resize(sample_count);
-				}
 				break;
 		}
 	}
 
 	endwin();
-	return 0;
 }
