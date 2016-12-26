@@ -3,7 +3,7 @@ CXX=g++
 
 CFLAGS=-c -O2 -MMD -MP -Wstrict-prototypes
 CXXFLAGS=-c -O2 -MMD -MP
-LDFLAGS=-lpulse-simple -lncurses
+LDFLAGS=-lpulse-simple -lncurses -lpthread
 
 BUILD_DIR=build
 BINARY=${BUILD_DIR}/analyzer

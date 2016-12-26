@@ -5,6 +5,8 @@
 
 #include<vector>
 #include<complex>
+#include<thread>
+#include<atomic>
 
 const int MIN_SAMPLE_COUNT = 32;
 const int MAX_SAMPLE_COUNT = 1 << 16;
@@ -29,23 +31,16 @@ int main() {
 
 	std::vector<std::complex<double>> data(sample_count);
 
+	std::thread sample_thread;
+
 	bool running = true;
-	bool auto_sample = false;
+	std::atomic<bool> auto_sample(false);
 	while(running) {
-		if(auto_sample) {
-			data.resize(sample_count);
-			read_stream(buffer, sizeof(short) * sample_count);
-
-			for(int i = 0; i < sample_count; ++i)
-				data[i] = (double) buffer[i];
-			fft(data);
-		}
-
 		clear();
 		printw("Threshold: %d\n", threshold);
 		printw("Frequency: %d - %d Hz\n", min_frequency, max_frequency);
 		printw("Sample count: %d\n", sample_count);
-		printw("====================\n");
+		printw("=====================\n");
 
 		for(int i = 0; i < (int) data.size() / 2; ++i) {
 			double freq = (double) SAMPLE_RATE / data.size() * i;
@@ -59,7 +54,7 @@ int main() {
 
 		if(auto_sample) {
 			attron(A_BOLD);
-			mvprintw(3, 3, " Sampling ... ");
+			mvprintw(3, 3, " AUTO Sampling ");
 			attroff(A_BOLD);
 		}
 
@@ -92,10 +87,21 @@ int main() {
 				if(auto_sample) {
 					auto_sample = false;
 					free_stream();
+					sample_thread.join();
 				} else {
 					auto_sample = true;
 					open_stream();
-					data.resize(sample_count);
+
+					sample_thread = std::thread([&] {
+						while(auto_sample) {
+							read_stream(buffer, sizeof(short) * sample_count);
+
+							data.resize(sample_count);
+							for(int i = 0; i < sample_count; ++i)
+								data[i] = (double) buffer[i];
+							fft(data);
+						}
+					});
 				}
 				break;
 
