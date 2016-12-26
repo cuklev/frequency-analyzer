@@ -141,5 +141,11 @@ int main() {
 		}
 	}
 
+	if(auto_sample) {
+		auto_sample = false;
+		free_stream();
+		sample_thread.join();
+	}
+
 	endwin();
 }
