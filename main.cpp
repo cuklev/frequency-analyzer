@@ -7,6 +7,7 @@
 #include<complex>
 #include<thread>
 #include<atomic>
+#include<algorithm>
 
 const int MIN_SAMPLE_COUNT = 32;
 const int MAX_SAMPLE_COUNT = 1 << 16;
@@ -42,6 +43,7 @@ int main() {
 		printw("Sample count: %d\n", sample_count);
 		printw("=====================\n");
 
+		std::vector<std::pair<double, double>> frequencies;
 		for(int i = 0; i < (int) data.size() / 2; ++i) {
 			double freq = (double) SAMPLE_RATE / data.size() * i;
 			if(freq < min_frequency || freq > max_frequency)
@@ -49,8 +51,10 @@ int main() {
 			double amp = abs(data[i]) * 2 / sample_count;
 			if(amp < threshold)
 				continue;
-			printw("%lfHz\n", freq);
+			frequencies.push_back({amp, freq});
 		}
+		std::sort(frequencies.begin(), frequencies.end(), [](auto x, auto y) { return x.first > y.first; });
+		for(auto& f : frequencies) printw("%lfHz\n", f.second);
 
 		if(auto_sample) {
 			attron(A_BOLD);
