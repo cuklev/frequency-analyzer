@@ -90,8 +90,8 @@ int main() {
 			case 'S':
 				if(auto_sample) {
 					auto_sample = false;
-					free_stream();
 					sample_thread.join();
+					free_stream();
 				} else {
 					auto_sample = true;
 					open_stream();
@@ -147,8 +147,8 @@ int main() {
 
 	if(auto_sample) {
 		auto_sample = false;
-		free_stream();
 		sample_thread.join();
+		free_stream();
 	}
 
 	endwin();
