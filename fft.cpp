@@ -1,4 +1,6 @@
 #include "fft.hpp"
+#include <vector>
+#include <complex>
 
 namespace {
 
@@ -25,7 +27,7 @@ inline uint32_t reverse_bits(uint32_t n, int bit_count) {
 
 }
 
-std::vector<ComplexNumber> fft(short* buffer, size_t sample_count) {
+void fft_get_amplitudes(short* buffer, size_t sample_count, double* amplitudes) {
 	int bit_count = __builtin_ctz(sample_count);
 
 	auto data = std::vector<ComplexNumber>(sample_count);
@@ -34,16 +36,13 @@ std::vector<ComplexNumber> fft(short* buffer, size_t sample_count) {
 		data[j] = {(double) buffer[i], 0};
 	}
 
-	for(int k = 0; k < bit_count; ++k)
-	{
+	for(int k = 0; k < bit_count; ++k) {
 		double angle = M_PI / (1 << k);
 		ComplexNumber primitive_root = {cos(angle), sin(angle)};
 
-		for(unsigned i = 0; i < data.size(); i += (2u << k))
-		{
+		for(unsigned i = 0; i < data.size(); i += (2u << k)) {
 			ComplexNumber w = {1, 0};
-			for(unsigned j = i; j < i + (1u << k); ++j)
-			{
+			for(unsigned j = i; j < i + (1u << k); ++j) {
 				data[j + (1u << k)] *= w;
 				auto diff = data[j] - data[j + (1u << k)];
 				data[j] += data[j + (1u << k)];
@@ -54,5 +53,6 @@ std::vector<ComplexNumber> fft(short* buffer, size_t sample_count) {
 		}
 	}
 
-	return data;
+	for(size_t i = 0; i < sample_count; ++i)
+		amplitudes[i] = abs(data[i]);
 }

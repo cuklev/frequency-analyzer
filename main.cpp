@@ -1,13 +1,12 @@
 #include "stream.h"
 #include "fft.hpp"
 
-#include<ncurses.h>
+#include <ncurses.h>
 
-#include<vector>
-#include<complex>
-#include<thread>
-#include<atomic>
-#include<algorithm>
+#include <vector>
+#include <thread>
+#include <atomic>
+#include <algorithm>
 
 const int MIN_SAMPLE_COUNT = 32;
 const int MAX_SAMPLE_COUNT = 1 << 16;
@@ -18,6 +17,7 @@ const int THRESHOLD_CHANGE_STEP = 100;
 const int SAMPLE_RATE = 44100;
 
 short buffer[MAX_SAMPLE_COUNT];
+double amplitudes[MAX_SAMPLE_COUNT];
 
 int main() {
 	initscr();
@@ -29,8 +29,6 @@ int main() {
 	int max_frequency = 20000;
 	int threshold = 1000;
 	int sample_count = 1 << 15;
-
-	std::vector<std::complex<double>> data(sample_count);
 
 	std::thread sample_thread;
 
@@ -44,11 +42,11 @@ int main() {
 		printw("=====================\n");
 
 		std::vector<std::pair<double, double>> frequencies;
-		for(int i = 0; i < (int) data.size() / 2; ++i) {
-			double freq = (double) SAMPLE_RATE / data.size() * i;
+		for(int i = 0; i < sample_count / 2; ++i) {
+			double freq = (double) SAMPLE_RATE / sample_count * i;
 			if(freq < min_frequency || freq > max_frequency)
 				continue;
-			double amp = abs(data[i]) * 2 / sample_count;
+			double amp = amplitudes[i] * 2 / sample_count;
 			if(amp < threshold)
 				continue;
 			frequencies.push_back({amp, freq});
@@ -81,9 +79,9 @@ int main() {
 				read_stream(buffer, sizeof(short) * sample_count);
 				free_stream();
 
-				data = fft(buffer, sample_count);
-
+				fft_get_amplitudes(buffer, sample_count, amplitudes);
 				break;
+
 			case 'S':
 				if(auto_sample) {
 					auto_sample = false;
@@ -96,7 +94,7 @@ int main() {
 					sample_thread = std::thread([&] {
 						while(auto_sample) {
 							read_stream(buffer, sizeof(short) * sample_count);
-							data = fft(buffer, sample_count);
+							fft_get_amplitudes(buffer, sample_count, amplitudes);
 						}
 					});
 				}

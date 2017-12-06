@@ -1,9 +1,8 @@
 #ifndef __FFT_HPP
 #define __FFT_HPP
 
-#include <vector>
-#include <complex>
+#include <cstddef>
 
-std::vector<std::complex<double>> fft(short*, size_t);
+void fft_get_amplitudes(short*, size_t, double*);
 
 #endif
