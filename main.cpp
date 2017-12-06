@@ -8,16 +8,16 @@
 #include <atomic>
 #include <algorithm>
 
-const int MIN_SAMPLE_COUNT = 32;
-const int MAX_SAMPLE_COUNT = 1 << 16;
+const int MinSampleCount = 32;
+const int MaxSampleCount = 1 << 16;
 
-const int FREQUENCY_CHANGE_STEP = 100;
-const int THRESHOLD_CHANGE_STEP = 100;
+const int FrequencyChangeStep = 100;
+const int ThresholdChangeStep = 100;
 
-const int SAMPLE_RATE = 44100;
+const int SampleRate = 44100;
 
-short buffer[MAX_SAMPLE_COUNT];
-double amplitudes[MAX_SAMPLE_COUNT];
+short buffer[MaxSampleCount];
+double amplitudes[MaxSampleCount];
 
 int main() {
 	initscr();
@@ -43,7 +43,7 @@ int main() {
 
 		std::vector<std::pair<double, double>> frequencies;
 		for(int i = 0; i < sample_count / 2; ++i) {
-			double freq = (double) SAMPLE_RATE / sample_count * i;
+			double freq = (double) SampleRate / sample_count * i;
 			if(freq < min_frequency || freq > max_frequency)
 				continue;
 			double amp = amplitudes[i] * 2 / sample_count;
@@ -101,36 +101,36 @@ int main() {
 				break;
 
 			case 'z':
-				if(min_frequency - FREQUENCY_CHANGE_STEP >= 0)
-					min_frequency -= FREQUENCY_CHANGE_STEP;
+				if(min_frequency - FrequencyChangeStep >= 0)
+					min_frequency -= FrequencyChangeStep;
 				break;
 			case 'x':
-				if(min_frequency + FREQUENCY_CHANGE_STEP < max_frequency)
-					min_frequency += FREQUENCY_CHANGE_STEP;
+				if(min_frequency + FrequencyChangeStep < max_frequency)
+					min_frequency += FrequencyChangeStep;
 				break;
 			case 'c':
-				if(max_frequency - FREQUENCY_CHANGE_STEP > min_frequency)
-					max_frequency -= FREQUENCY_CHANGE_STEP;
+				if(max_frequency - FrequencyChangeStep > min_frequency)
+					max_frequency -= FrequencyChangeStep;
 				break;
 			case 'v':
-				if(max_frequency + FREQUENCY_CHANGE_STEP <= 20000)
-					max_frequency += FREQUENCY_CHANGE_STEP;
+				if(max_frequency + FrequencyChangeStep <= 20000)
+					max_frequency += FrequencyChangeStep;
 				break;
 
 			case '[':
-				if(threshold - THRESHOLD_CHANGE_STEP >= 0)
-					threshold -= THRESHOLD_CHANGE_STEP;
+				if(threshold - ThresholdChangeStep >= 0)
+					threshold -= ThresholdChangeStep;
 				break;
 			case ']':
-				threshold += THRESHOLD_CHANGE_STEP;
+				threshold += ThresholdChangeStep;
 				break;
 
 			case 'w':
-				if(sample_count > MIN_SAMPLE_COUNT)
+				if(sample_count > MinSampleCount)
 					sample_count >>= 1;
 				break;
 			case 'e':
-				if(sample_count < MAX_SAMPLE_COUNT)
+				if(sample_count < MaxSampleCount)
 					sample_count <<= 1;
 				break;
 		}
