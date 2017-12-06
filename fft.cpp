@@ -1,22 +1,27 @@
 #include "fft.hpp"
 
+
+namespace {
+
 using ComplexNumber = std::complex<double>;
 
-#define MASK0 0x55555555
-#define MASK1 0x33333333
-#define MASK2 0x0F0F0F0F
-#define MASK3 0x00FF00FF
-#define MASK4 0x0000FFFF
-#define SWAP_MASK(mask, bits) n = ((n & MASK##mask) << bits) | ((n >> bits) & MASK##mask)
+const uint32_t Mask0 = 0x55555555;
+const uint32_t Mask1 = 0x33333333;
+const uint32_t Mask2 = 0x0F0F0F0F;
+const uint32_t Mask3 = 0x00FF00FF;
+const uint32_t Mask4 = 0x0000FFFF;
 
-inline uint32_t reverse_bits(uint32_t n, int bits)
-{
-	SWAP_MASK(0, 1);
-	SWAP_MASK(1, 2);
-	SWAP_MASK(2, 4);
-	SWAP_MASK(3, 8);
-	SWAP_MASK(4, 16);
-	return n >> (32 - bits);
+inline void swap_mask(uint32_t& n, uint32_t mask, int bit_count) {
+	n = ((n & mask) << bit_count) | ((n >> bit_count) & mask);
+}
+
+inline uint32_t reverse_bits(uint32_t n, int bit_count) {
+	swap_mask(n, Mask0, 1);
+	swap_mask(n, Mask1, 2);
+	swap_mask(n, Mask2, 4);
+	swap_mask(n, Mask3, 8);
+	swap_mask(n, Mask4, 16);
+	return n >> (32 - bit_count);
 }
 
 inline void swap_reverse(std::vector<ComplexNumber>& data, int bits)
@@ -27,6 +32,9 @@ inline void swap_reverse(std::vector<ComplexNumber>& data, int bits)
 		if(i < j) std::swap(data[i], data[j]);
 	}
 }
+
+}
+
 
 void fft(std::vector<ComplexNumber>& data)
 {
