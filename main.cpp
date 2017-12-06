@@ -81,10 +81,7 @@ int main() {
 				read_stream(buffer, sizeof(short) * sample_count);
 				free_stream();
 
-				data.resize(sample_count);
-				for(int i = 0; i < sample_count; ++i)
-					data[i] = (double) buffer[i];
-				fft(data);
+				data = fft(buffer, sample_count);
 
 				break;
 			case 'S':
@@ -99,11 +96,7 @@ int main() {
 					sample_thread = std::thread([&] {
 						while(auto_sample) {
 							read_stream(buffer, sizeof(short) * sample_count);
-
-							data.resize(sample_count);
-							for(int i = 0; i < sample_count; ++i)
-								data[i] = (double) buffer[i];
-							fft(data);
+							data = fft(buffer, sample_count);
 						}
 					});
 				}

@@ -1,6 +1,5 @@
 #include "fft.hpp"
 
-
 namespace {
 
 using ComplexNumber = std::complex<double>;
@@ -24,24 +23,18 @@ inline uint32_t reverse_bits(uint32_t n, int bit_count) {
 	return n >> (32 - bit_count);
 }
 
-inline void swap_reverse(std::vector<ComplexNumber>& data, int bits)
-{
-	for(uint32_t i = 0; i < data.size(); ++i)
-	{
-		auto j = reverse_bits(i, bits);
-		if(i < j) std::swap(data[i], data[j]);
+}
+
+std::vector<ComplexNumber> fft(short* buffer, size_t sample_count) {
+	int bit_count = __builtin_ctz(sample_count);
+
+	auto data = std::vector<ComplexNumber>(sample_count);
+	for(size_t i = 0; i < sample_count; ++i) {
+		auto j = reverse_bits(i, bit_count);
+		data[j] = {(double) buffer[i], 0};
 	}
-}
 
-}
-
-
-void fft(std::vector<ComplexNumber>& data)
-{
-	int bits = __builtin_ctz(data.size());
-	swap_reverse(data, bits);
-
-	for(int k = 0; k < bits; ++k)
+	for(int k = 0; k < bit_count; ++k)
 	{
 		double angle = M_PI / (1 << k);
 		ComplexNumber primitive_root = {cos(angle), sin(angle)};
@@ -60,4 +53,6 @@ void fft(std::vector<ComplexNumber>& data)
 			}
 		}
 	}
+
+	return data;
 }
