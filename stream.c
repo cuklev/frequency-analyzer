@@ -11,15 +11,14 @@ static pa_sample_spec ss = {
 
 void open_stream(void) {
 	s = pa_simple_new(NULL,
-			"Test",
-			PA_STREAM_RECORD,
-			NULL,
-			"Music",
-			&ss,
-			NULL,
-			NULL,
-			NULL
-			);
+		"Analyzer",
+		PA_STREAM_RECORD,
+		NULL,
+		"Recording",
+		&ss,
+		NULL,
+		NULL,
+		NULL);
 }
 
 void read_stream(void *buffer, int buf_size) {
